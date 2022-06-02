@@ -1,21 +1,39 @@
 const connectDb = require('./database');
 const express = require('express');
+
 const app = express();
+
+//Routes Imports
 const urlRoutes = require('./api/urls/urls.routes');
 const userRoutes = require('./api/users/users.routes');
 
+//Passport Imports
+const passport = require('passport');
+
+//Passport Middeware
+const { localStrategy } = require('./middleware/passport');
+
+//Connection to Database
 connectDb();
+
+//MiddleWare
 app.use(express.json());
 
+//Routes
 app.use('/urls', urlRoutes);
 app.use(userRoutes);
 
+app.use(passport.initialize());
+passport.use(localStrategy);
+
+// Path Not Found MiddleWare
 app.use((req, res, next) => {
   const err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
 
+// Error Handeling MiddleWare
 app.use((err, req, res, next) => {
   res.status(err.status || 500);
   res.json({
@@ -25,6 +43,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(8000, () => {
+app.listen(8005, () => {
   console.log('The application is running on localhost:8000');
 });
