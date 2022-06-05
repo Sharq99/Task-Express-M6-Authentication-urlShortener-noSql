@@ -11,7 +11,7 @@ const userRoutes = require('./api/users/users.routes');
 const passport = require('passport');
 
 //Passport Middeware
-const { localStrategy } = require('./middleware/passport');
+const { localStrategy, jwtStrategy } = require('./middleware/passport');
 
 //Connection to Database
 connectDb();
@@ -23,8 +23,10 @@ app.use(express.json());
 app.use('/urls', urlRoutes);
 app.use(userRoutes);
 
+//MiddleWare
 app.use(passport.initialize());
 passport.use(localStrategy);
+passport.use(jwtStrategy);
 
 // Path Not Found MiddleWare
 app.use((req, res, next) => {

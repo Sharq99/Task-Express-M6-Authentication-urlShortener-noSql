@@ -1,9 +1,12 @@
 // const User = require('');
 const User = require("../models/User");
 const bcrypt = require('bcryptjs');
+const { fromAuthHeaderAsBearerToken } = require("passport-jwt/lib/extract_jwt");
+const { JWT_SECRET } = require("../config/keys");
 
 
 const LocalStrategy = require('passport-local').Strategy
+const JWTStrategy = require('passport-jwt').Strategy
 
 exports.localStrategy = new LocalStrategy(async (username, password, done) => { // {usernameField: "name"} ==> it is used when your feild does not include username, so you tell it to treat name as username
    try {
@@ -24,3 +27,19 @@ exports.localStrategy = new LocalStrategy(async (username, password, done) => { 
 //     if(isMatch) return done(null, foundUser)
 //     else done(null, false)
 // } else {done()}
+
+
+exports.jwtStrategy = new JWTStrategy({jwtFromRequest: fromAuthHeaderAsBearerToken(), secretOrKey: JWT_SECRET}, 
+    async (jwtPayload, done) => { // {usernameField: "name"} ==> it is used when your feild does not include username, so you tell it to treat name as username
+        if(Date.now() > jwtPayload.exp){
+            done(null, false);
+        }
+        try {
+            const foundUser =  await  User.findById(jwtPayload._id); // Find the User by their id
+            if(foundUser) done(null, foundUser);
+            else done(null, false);
+        } catch (error) {
+            done(error);
+        }
+    }
+);

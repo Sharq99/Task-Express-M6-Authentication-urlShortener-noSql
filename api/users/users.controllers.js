@@ -58,3 +58,17 @@ exports.signup = async (req, res) => { // Sign Up with Remember Me
 };
 
 
+exports.deleteUser = async (req, res, next) => {
+  const { userId } = req.params;
+  try {
+    const foundUser = await User.findById(userId);
+    await foundUser.remove();
+    res.status(204).end();  
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+
+
