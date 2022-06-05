@@ -38,7 +38,7 @@ exports.deleteUrl = async (req, res) => {
   try {
     const url = await Url.findOne({ urlCode: req.params.code });
     if (url) {
-      if(url.userId === req.user._id){
+      if(url.userId.toString() === req.user._id.toString()){
         await Url.findByIdAndDelete(url._id);
         return res.status(201).json('Deleted');
       } else { return res.status(401).json('Unauthorized'); }
